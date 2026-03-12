@@ -28,6 +28,6 @@ export const askQuestion = async (question)=>{
 
     const response = await model.invoke(prompt)
     console.log("Executed ragservices.js")
-    return response.content
+    return response.content.trim()
 }
 
