@@ -3,10 +3,15 @@ import embedding from "../config/embeddings.js"
 import index from "../config/pincone.js"
 import model from "../config/gemini.js"
 
-export const askQuestion = async (question)=>{
+export const askQuestion = async (question,namespace)=>{
+
     const vectorStore = await PineconeStore.fromExistingIndex(
         embedding,
-        {pineconeIndex : index}
+        {
+            pineconeIndex : index,
+            namespace
+        },
+        
     )
 
     const retriever = vectorStore.asRetriever({
@@ -14,6 +19,7 @@ export const askQuestion = async (question)=>{
     })
 
     const docs = await retriever.invoke(question)
+    // console.log("DOCSSS: ",docs)
     const context = docs.map(doc => doc.pageContent).join("\n")
 
     const prompt = `You are a helpful assistant. 

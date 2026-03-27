@@ -2,8 +2,8 @@ import { askQuestion } from "../services/ragServices.js";
 
 export const chat = async (req,res) =>{
     try{
-        const {question} = req.body
-        const answer = await askQuestion(question)
+        const {question,namespace} = req.body
+        const answer = await askQuestion(question,namespace)
 
         res.json({
             answer
