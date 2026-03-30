@@ -1,35 +1,3 @@
-// import { loadGithubRepo } from "../services/githubLoader.js";
-// import { splitDocuments } from "../services/chunkService.js";
-// import { ingestionDocuments } from "../services/ingestionService.js";
-
-// export const ingestRepo = async (req, res) => {
-
-//   try {
-
-//     const { owner} = req.body;
-
-//     const documents = await loadGithubRepo(owner);
-
-//     const chunks = await splitDocuments(documents);
-
-//     await ingestionDocuments(chunks,repo);
-
-//     res.json({
-//       message: "Repository indexed successfully",
-//       chunks: chunks.length
-//     });
-
-//   } catch (error) {
-
-//     res.status(500).json({
-//       error: error.message
-//     });
-
-//   }
-// };
-
-// controllers/ingestController.js
-
 import { loadGithubRepo } from "../services/githubLoader.js";
 import { splitDocuments } from "../services/chunkService.js";
 import { ingestionDocuments } from "../services/ingestionService.js";
@@ -37,7 +5,7 @@ import { ingestionDocuments } from "../services/ingestionService.js";
 export const ingestRepo = async (req, res) => {
   try {
 
-    // ================= UPDATED PART =================
+    // UPDATED PART 
     const { owner, repo } = req.body;
 
     if (!owner || !repo) {
@@ -49,17 +17,17 @@ export const ingestRepo = async (req, res) => {
     // Create unique session namespace
     const namespace = `session-${Date.now()}`;
     console.log("Generated namespace:", namespace);
-    // =================================================
+
 
     const documents = await loadGithubRepo(owner, repo);
 
     const chunks = await splitDocuments(documents);
 
-    // ================= UPDATED PART =================
+    // UPDATED PART
     await ingestionDocuments(chunks, namespace);
-    // =================================================
 
-    // ================= UPDATED PART =================
+
+    // UPDATED PART 
     // Optional auto-cleanup after 10 minutes
     setTimeout(async () => {
       try {
@@ -73,15 +41,13 @@ export const ingestRepo = async (req, res) => {
         console.error("Cleanup error:", err.message);
       }
     }, 10 * 60 * 1000); // 10 minutes
-    // =================================================
 
     res.json({
       message: "Repository indexed successfully",
       chunks: chunks.length,
 
-      // ================= UPDATED PART =================
+      // UPDATED PART 
       namespace // send this to frontend
-      // =================================================
     });
 
   } catch (error) {

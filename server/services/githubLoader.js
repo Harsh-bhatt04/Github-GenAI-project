@@ -17,15 +17,15 @@ const allowedExtensions = [".js", ".ts", ".jsx", ".tsx", ".py", ".java", ".md", 
  */
 export const loadGithubRepo = async (owner, repo) => {
   try {
-    // ===================== UPDATED PART =====================
+    // UPDATED PART
     // Fetch the entire repo tree recursively in ONE API call
     const treeUrl = `https://api.github.com/repos/${owner}/${repo}/git/trees/HEAD?recursive=1`;
     console.log("Fetching repo tree from:", treeUrl); // debug log
     const treeRes = await axios.get(treeUrl);
     const tree = treeRes.data.tree; // contains all files and paths
-    // ==========================================================
 
-    // ===================== UPDATED PART =====================
+
+    // UPDATED PART
     // Filter only allowed file types and blobs (ignore folders)
     const files = tree.filter(
       f =>
@@ -33,9 +33,9 @@ export const loadGithubRepo = async (owner, repo) => {
         allowedExtensions.some(ext => f.path.endsWith(ext)) &&
         f.size < 100000 // skip files larger than 100 KB
     );
-    // ==========================================================
+    // 
 
-    // ===================== UPDATED PART =====================
+    // UPDATED PART
     // Fetch content of all filtered files in parallel (with safety)
     const documents = await Promise.all(
       files.map(async file => {
@@ -48,7 +48,7 @@ export const loadGithubRepo = async (owner, repo) => {
         });
       })
     );
-    // ==========================================================
+
 
     console.log(`Loaded ${documents.length} documents from ${owner}/${repo}`);
     return documents;

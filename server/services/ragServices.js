@@ -31,7 +31,6 @@ export const askQuestion = async (question,namespace)=>{
     answer clearly using the context.
     
     `
-
     const response = await model.invoke(prompt)
     console.log("Executed ragservices.js")
     return response.content.trim()
