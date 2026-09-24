@@ -102,22 +102,82 @@ function App() {
     }
   }
 
-  const handleSendQuestion = async (prompt) => {
-    setChatError('')
-    setLoadingChat(true)
-    setMessages((current) => [...current, { role: 'user', text: prompt }])
-    try {
-      const result = await askChat(prompt, namespace)
-      setMessages((current) => [...current, { role: 'assistant', text: result.answer ?? result }])
-      setQuestion('')
-    } catch (error) {
-      setChatError(error.message)
-      setMessages((current) => [...current, { role: 'assistant', text: 'Unable to answer right now. Please try again.' }])
-    } finally {
-      setLoadingChat(false)
+const handleSendQuestion = async (prompt) => {
+  setChatError('')
+  setLoadingChat(true)
+
+  setMessages((current) => [
+    ...current,
+    { role: 'user', text: prompt },
+    { role: 'assistant', text: '' },
+  ])
+
+  let wordQueue = []
+  let displayedText = ''
+  let processing = false
+
+  const processWords = async () => {
+    if (processing) return
+
+    processing = true
+
+    while (wordQueue.length > 0) {
+      const word = wordQueue.shift()
+
+      displayedText += word
+
+      setMessages((current) => {
+        const updated = [...current]
+        const lastMessage = updated[updated.length - 1]
+
+        updated[updated.length - 1] = {
+          ...lastMessage,
+          text: displayedText,
+        }
+
+        return updated
+      })
+
+      // Controls the word-by-word speed
+      await new Promise((resolve) => setTimeout(resolve, 25))
     }
+
+    processing = false
   }
 
+  try {
+    await askChat(prompt, namespace, (chunk) => {
+      // Keep spaces attached to the word
+      const words = chunk.match(/\S+\s*/g) || []
+
+      wordQueue.push(...words)
+
+      processWords()
+    })
+
+    // Wait until all queued words are displayed
+    while (processing || wordQueue.length > 0) {
+      await new Promise((resolve) => setTimeout(resolve, 10))
+    }
+
+    setQuestion('')
+  } catch (error) {
+    setChatError(error.message)
+
+    setMessages((current) => {
+      const updated = [...current]
+
+      updated[updated.length - 1] = {
+        role: 'assistant',
+        text: 'Unable to answer right now. Please try again.',
+      }
+
+      return updated
+    })
+  } finally {
+    setLoadingChat(false)
+  }
+}
   const chosenSamples = useMemo(
     () => sampleQuestions.filter((item) => !messages.some((m) => m.text === item)),
     [messages],
