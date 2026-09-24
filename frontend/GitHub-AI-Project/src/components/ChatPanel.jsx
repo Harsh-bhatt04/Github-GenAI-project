@@ -1,3 +1,5 @@
+import { useEffect, useRef } from 'react'
+
 export default function ChatPanel({
   messages,
   question,
@@ -8,7 +10,19 @@ export default function ChatPanel({
   error,
   samples,
   onChooseSample,
-}) {
+}) 
+{
+
+  const messagesEndRef = useRef(null)
+
+useEffect(() => {
+  messagesEndRef.current?.scrollIntoView({
+    behavior: 'auto',
+  })
+
+}, [messages])
+
+
   return (
     <div className="flex h-full flex-col gap-6">
       <div className="space-y-3">
@@ -71,6 +85,7 @@ export default function ChatPanel({
               </div>
             ))
           )}
+          <div ref={messagesEndRef} />
         </div>
       </div>
 

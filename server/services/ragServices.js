@@ -3,7 +3,7 @@ import embedding from '../config/embeddings.js'
 import index from '../config/pincone.js'
 import model from '../config/gemini.js'
 
-export const askQuestion = async (question, namespace) => {
+export async function* askQuestion(question, namespace) {
   console.log('Executing askQuestion in ragServices.js')
   console.log('namespace:', namespace)
 
@@ -54,10 +54,17 @@ ${question}
 
 If the repository content does not answer the question, say: "I don't know enough from the repository content."`
 
-  const response = await model.invoke(prompt)
-  console.log('Model response:', response)
-  console.log('Executed ragservices.js')
-  const answer = typeof response?.content === 'string' ? response.content : response?.content?.[0]?.text
-  return answer?.trim() ?? ''
+  const stream = await model.stream(prompt)
+
+  for await (const chunk of stream) {
+    const text =
+      typeof chunk.content === 'string'
+        ? chunk.content
+        : chunk.content?.[0]?.text
+
+    if (text) {
+      yield text
+    }
+  }
 }
 
