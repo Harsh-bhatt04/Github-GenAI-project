@@ -1,0 +1,23 @@
+services:
+
+  server:
+    build:
+      context: ./server
+    container_name: github-genai-server
+    env_file:
+      - ./server/.env
+    ports:
+      - "5000:5000"
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend/<github-Ai-Project>
+      args:
+        VITE_API_BASE_URL: http://localhost:5000
+    container_name: github-genai-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - server
+    restart: unless-stopped

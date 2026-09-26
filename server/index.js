@@ -13,12 +13,12 @@ console.log('PINECONE_API_KEY set:', Boolean(process.env.PINECONE_API_KEY))
 
 app.use(cors())
 app.use(express.json())
-const testEmbedding = async ()=>{
-    const vector = await embedding.embedQuery("hello world")
-    console.log("Vector length: ", vector.length);
+// const testEmbedding = async ()=>{
+//     const vector = await embedding.embedQuery("hello world")
+//     console.log("Vector length: ", vector.length);
     
-}
-testEmbedding()
+// }
+// testEmbedding()
 
 app.use("/api",chatRoutes)
 app.use("/repo", repoRoutes);
